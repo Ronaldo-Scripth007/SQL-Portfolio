@@ -88,4 +88,4 @@ PostgreSQL · DBeaver
 
 ## Autor
 
-**Ronaldo** · [Linkedim][(https://github.com/Ronaldo-Scripth007](https://www.linkedin.com/in/ronaldo-rodrigues-600743165/?isSelfProfile=true)) 
+**Ronaldo** · [GitHub](https://github.com/Ronaldo-Scripth007) · [LinkedIn](https://www.linkedin.com/in/ronaldo-rodrigues-600743165/?isSelfProfile=true)
