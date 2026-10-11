@@ -8,6 +8,7 @@ O foco não é só a sintaxe: cada arquivo parte de uma pergunta de negócio, ex
 
 | Arquivo | Pergunta de negócio | Técnicas |
 |---|---|---|
+| [`00_criar_tabelas.sql`](00_criar_tabelas.sql) | Como recriar o banco para executar as consultas? | `CREATE SCHEMA`, `CREATE TABLE` |
 | [`01_ranking.sql`](01_ranking.sql) | Quem são os clientes de maior renda? Como tratar empates? | `RANK`, `DENSE_RANK`, `ROW_NUMBER` |
 | [`02_medias_moveis.sql`](02_medias_moveis.sql) | A receita está subindo ou caindo, sem o ruído mensal? | `AVG() OVER` com frame, `date_trunc` |
 | [`03_lag_lead_comparacao_periodos.sql`](03_lag_lead_comparacao_periodos.sql) | Quanto variamos vs. mês anterior (MoM) e ano anterior (YoY)? | `LAG`, `LEAD`, `NULLIF` |
@@ -17,15 +18,20 @@ O foco não é só a sintaxe: cada arquivo parte de uma pergunta de negócio, ex
 
 ## Modelo de dados
 
-Schema `vendas`, colunas usadas nas consultas:
+Schema `vendas`, com 6 tabelas (script de criação em [`00_criar_tabelas.sql`](00_criar_tabelas.sql)). As consultas deste repositório usam `clientes`, `produtos` e `pedidos`.
 
 | Tabela | Colunas |
 |---|---|
-| `clientes` | `ID_Cliente`, `Nome`, `Email`, `Renda_Anual` |
+| `categorias` | `ID_Categoria`, `Categoria` |
+| `clientes` | `ID_Cliente`, `Nome`, `Sobrenome`, `Data_Nascimento`, `Estado_Civil`, `Sexo`, `Email`, `Telefone`, `Renda_Anual`, `Qtd_Filhos`, `Escolaridade` |
+| `locais` | `Cidade`, `Estado`, `Região` |
+| `lojas` | `ID_Loja`, `Loja`, `Gerente`, `Endereco`, `Num_Funcionarios`, `Telefone` |
 | `produtos` | `ID_Produto`, `Nome_Produto`, `ID_Categoria`, `Marca_Produto`, `Num_Serie`, `Preco_Unit`, `Custo_Unit` |
-| `pedidos` | `ID_Produto`, `Data_Venda`, `Qtd_Vendida`, `Receita_Venda` |
+| `pedidos` | `ID_Pedido`, `Data_Venda`, `ID_Loja`, `ID_Produto`, `ID_Cliente`, `Qtd_Vendida`, `Receita_Venda`, `Custo_Venda`, `Custo_Unit`, `Preco_Unit` |
 
-Relacionamento: `pedidos.ID_Produto` → `produtos.ID_Produto`.
+Relacionamentos (lógicos, sem chaves estrangeiras declaradas): `pedidos.ID_Cliente` → `clientes`, `pedidos.ID_Produto` → `produtos`, `pedidos.ID_Loja` → `lojas` e `produtos.ID_Categoria` → `categorias`.
+
+`Data_Venda` é do tipo `text`; as consultas convertem para data com `::date`.
 
 > Os nomes das colunas usam maiúsculas, por isso aparecem entre aspas duplas (`"ID_Produto"`). No PostgreSQL, identificadores sem aspas são convertidos para minúsculas.
 
@@ -39,27 +45,32 @@ Relacionamento: `pedidos.ID_Produto` → `produtos.ID_Produto`.
 
 ## Como executar
 
-1. Tenha um PostgreSQL com o schema `vendas` e as três tabelas acima.
-2. Abra qualquer arquivo em um cliente SQL (DBeaver, pgAdmin, `psql`).
-3. Execute **uma consulta por vez**: cada arquivo contém várias, separadas por comentários numerados (`1.1`, `1.2`...).
+1. Tenha um PostgreSQL e um cliente SQL (DBeaver, pgAdmin ou `psql`).
+2. Execute [`00_criar_tabelas.sql`](00_criar_tabelas.sql) para criar o schema `vendas` e as tabelas.
+3. Carregue os dados executando os arquivos da pasta [`dados/`](dados/).
+4. Abra os arquivos `01` a `06` e execute **uma consulta por vez**: cada arquivo contém várias, separadas por comentários numerados (`1.1`, `1.2`...).
 
 ## Resultados
 
 Prints da execução no DBeaver.
 
 ### Ranking: RANK vs DENSE_RANK
-Empates recebem a mesma posição; o `RANK` pula números e o `DENSE_RANK` não.
+Empates recebem a mesma posição; o `RANK` pula números e o `DENSE_RANK` não. No resultado, Alyssa e Angela empatam em 3º e, a partir do 5º lugar, os dois rankings divergem (5 no `RANK`, 4 no `DENSE_RANK`).
 
 ![RANK vs DENSE_RANK](img/01_rank_vs_dense_rank.png)
 
 ### Média móvel de 3 meses
+Janeiro/19 (65.100) foi um pico isolado; a média móvel suaviza a série e, de abril em diante, oscila entre 13.000 e 15.800.
+
 ![Média móvel de 3 meses](img/02_media_movel_3_meses.png)
 
 ### Variação mês a mês (MoM)
+Fevereiro/19 caiu 83,17% sobre janeiro (101 → 17 unidades) e novembro/19 teve a maior alta do ano: +157,14%.
+
 ![Variação MoM](img/03_variacao_mom.png)
 
 ### Curva ABC de produtos (Pareto)
-A classe A reúne os produtos que compõem os primeiros 80% da receita; produtos sem nenhuma venda aparecem como "Sem venda".
+A classe A reúne os produtos que compõem os primeiros 80% da receita; produtos sem nenhuma venda aparecem como "Sem venda". No resultado, o Headphone Bluetooth 2000 sozinho responde por 91,48% da receita, e 12 dos 16 produtos não tiveram nenhuma venda.
 
 ![Curva ABC](img/04_curva_abc.png)
 
