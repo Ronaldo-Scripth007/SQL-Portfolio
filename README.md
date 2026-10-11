@@ -8,12 +8,12 @@ O foco não é só a sintaxe: cada arquivo parte de uma pergunta de negócio, ex
 
 | Arquivo | Pergunta de negócio | Técnicas |
 |---|---|---|
-| [`01_ranking.sql`](sql/01_ranking.sql) | Quem são os clientes de maior renda? Como tratar empates? | `RANK`, `DENSE_RANK`, `ROW_NUMBER` |
-| [`02_medias_moveis.sql`](sql/02_medias_moveis.sql) | A receita está subindo ou caindo, sem o ruído mensal? | `AVG() OVER` com frame, `date_trunc` |
-| [`03_lag_lead_comparacao_periodos.sql`](sql/03_lag_lead_comparacao_periodos.sql) | Quanto variamos vs. mês anterior (MoM) e ano anterior (YoY)? | `LAG`, `LEAD`, `NULLIF` |
-| [`04_acumulados_e_pareto.sql`](sql/04_acumulados_e_pareto.sql) | Quanto já vendemos no acumulado? Quais produtos geram 80% da receita? | `SUM() OVER`, curva ABC com `CASE` |
-| [`05_ntile_min_max.sql`](sql/05_ntile_min_max.sql) | Como segmentar clientes por renda? Qual o menor/maior volume em 3 meses? | `NTILE`, `MIN/MAX OVER` |
-| [`06_contribuicao_e_partition_by.sql`](sql/06_contribuicao_e_partition_by.sql) | Quanto cada mês pesa no total? Qual o produto mais caro de cada marca? | `PARTITION BY`, `SUM(SUM()) OVER ()` |
+| [`01_ranking.sql`](01_ranking.sql) | Quem são os clientes de maior renda? Como tratar empates? | `RANK`, `DENSE_RANK`, `ROW_NUMBER` |
+| [`02_medias_moveis.sql`](02_medias_moveis.sql) | A receita está subindo ou caindo, sem o ruído mensal? | `AVG() OVER` com frame, `date_trunc` |
+| [`03_lag_lead_comparacao_periodos.sql`](03_lag_lead_comparacao_periodos.sql) | Quanto variamos vs. mês anterior (MoM) e ano anterior (YoY)? | `LAG`, `LEAD`, `NULLIF` |
+| [`04_acumulados_e_pareto.sql`](04_acumulados_e_pareto.sql) | Quanto já vendemos no acumulado? Quais produtos geram 80% da receita? | `SUM() OVER`, curva ABC com `CASE` |
+| [`05_ntile_min_max.sql`](05_ntile_min_max.sql) | Como segmentar clientes por renda? Qual o menor/maior volume em 3 meses? | `NTILE`, `MIN/MAX OVER` |
+| [`06_contribuicao_e_partition_by.sql`](06_contribuicao_e_partition_by.sql) | Quanto cada mês pesa no total? Qual o produto mais caro de cada marca? | `PARTITION BY`, `SUM(SUM()) OVER ()` |
 
 ## Modelo de dados
 
@@ -45,9 +45,31 @@ Relacionamento: `pedidos.ID_Produto` → `produtos.ID_Produto`.
 
 ## Resultados
 
-_Adicione aqui prints dos resultados no DBeaver (pasta `img/`), por exemplo:_
+Prints da execução no DBeaver.
 
-<!-- ![Curva ABC](img/curva_abc.png) -->
+### Ranking: RANK vs DENSE_RANK
+Empates recebem a mesma posição; o `RANK` pula números e o `DENSE_RANK` não.
+
+![RANK vs DENSE_RANK](img/01_rank_vs_dense_rank.png)
+
+### Média móvel de 3 meses
+![Média móvel de 3 meses](img/02_media_movel_3_meses.png)
+
+### Variação mês a mês (MoM)
+![Variação MoM](img/03_variacao_mom.png)
+
+### Curva ABC de produtos (Pareto)
+A classe A reúne os produtos que somam até 80% da receita.
+
+![Curva ABC](img/04_curva_abc.png)
+
+### Quartis de renda dos clientes
+Faixa 1 = 25% de maior renda.
+
+![Quartis de renda](img/05_quartis_renda.png)
+
+### Contribuição de cada mês no total
+![Contribuição mensal](img/06_contribuicao_mensal.png)
 
 ## Ferramentas
 
