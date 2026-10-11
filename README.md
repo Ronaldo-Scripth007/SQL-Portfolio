@@ -59,17 +59,17 @@ Empates recebem a mesma posição; o `RANK` pula números e o `DENSE_RANK` não.
 ![Variação MoM](img/03_variacao_mom.png)
 
 ### Curva ABC de produtos (Pareto)
-A classe A reúne os produtos que somam até 80% da receita.
+A classe A reúne os produtos que compõem os primeiros 80% da receita; produtos sem nenhuma venda aparecem como "Sem venda".
 
 ![Curva ABC](img/04_curva_abc.png)
 
-### Quartis de renda dos clientes
-Faixa 1 = 25% de maior renda.
+### Menor e maior volume numa janela de 3 meses
+![Mínimo e máximo em 3 meses](img/05_min_max_3_meses.png)
 
-![Quartis de renda](img/05_quartis_renda.png)
+### Ranking de preço dentro de cada marca (PARTITION BY)
+O ranking reinicia a cada marca.
 
-### Contribuição de cada mês no total
-![Contribuição mensal](img/06_contribuicao_mensal.png)
+![Ranking por marca](img/06_ranking_por_marca.png)
 
 ## Ferramentas
 
